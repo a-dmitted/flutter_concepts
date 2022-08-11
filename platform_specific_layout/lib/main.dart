@@ -1,5 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:platform_specific_layout/layout/widget_factory.dart';
+import 'package:platform_specific_layout/layout/adaptive_factory.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,14 +12,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Platform Adaptive Layout',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        platform: TargetPlatform.iOS
-      ),
-      home: const MyHomePage(title: 'Platform Adaptive Layout'),
+    AdaptiveFactory(
+      materialTheme:
+          ThemeData(primarySwatch: Colors.blue, platform: TargetPlatform.iOS),
+      cupertinoTheme: const CupertinoThemeData(primaryColor: Colors.blue),
     );
+    return AdaptiveFactory.buildApp(
+        title: 'Platform Adaptive Layout',
+        home: const MyHomePage(title: 'Platform Adaptive Layout'));
   }
 }
 
@@ -35,11 +36,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
+    return AdaptiveFactory.buildScaffold(
+      title: Text(widget.title),
+      body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -49,12 +48,11 @@ class _MyHomePageState extends State<MyHomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                WidgetFactory.buildButton(
-                    context: context,
-                    child: const Text('Button'),
-                    onPressed: () {}),
-                WidgetFactory.buildSwitch(
-                    context: context,
+                AdaptiveFactory.buildTextButton(
+                  onPressed: () {},
+                  child: const Text('Button'),
+                ),
+                AdaptiveFactory.buildSwitch(
                     value: _value,
                     onChanged: (value) {
                       setState(() {
@@ -66,11 +64,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: (){},
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
