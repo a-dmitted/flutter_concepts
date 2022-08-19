@@ -48,6 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     _targetPlatform =
         Provider.of<PlatformController>(context, listen: true).targetPlatform;
+    int platformIndex = _targetPlatform.index;
     return AdaptiveFactory.buildScaffold(
       title: Text(widget.title),
       body: Padding(
@@ -62,28 +63,27 @@ class _MyHomePageState extends State<MyHomePage> {
                   const Text(
                     'Change platform:',
                   ),
-                  DropdownButton<TargetPlatform>(
-                    value: _targetPlatform,
+                  AdaptiveFactory.buildDropDown(
+                    context: context,
+                    value: platformIndex,
                     onChanged: (value) {
                       setState(() {
                         Provider.of<PlatformController>(context, listen: false)
-                            .targetPlatform = value!;
+                                .targetPlatform =
+                            TargetPlatform.values.elementAt(value!);
                       });
                     },
-                    items: const [
-                      DropdownMenuItem(
-                          value: TargetPlatform.android,
-                          child: Text('android')),
-                      DropdownMenuItem(
-                          value: TargetPlatform.iOS, child: Text('iOs')),
-                      DropdownMenuItem(
-                          value: TargetPlatform.windows,
-                          child: Text('windows')),
-                      DropdownMenuItem(
-                          value: TargetPlatform.linux, child: Text('linux')),
-                      DropdownMenuItem(
-                          value: TargetPlatform.macOS, child: Text('macOS')),
-                    ],
+                    items: TargetPlatform.values
+                        .map((platform) => DropdownMenuItem(
+                              value: platform.index,
+                              child: Text(
+                                TargetPlatform.values
+                                    .elementAt(platform.index)
+                                    .toString(),
+                              ),
+                            ))
+                        .toList(),
+                    valuesList: TargetPlatform.values,
                   ),
                 ],
               ),

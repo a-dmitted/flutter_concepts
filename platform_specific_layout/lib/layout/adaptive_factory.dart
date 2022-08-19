@@ -109,6 +109,81 @@ class AdaptiveFactory {
     );
   }
 
+  static Widget buildDropDown({
+    required BuildContext context,
+    required int value,
+    required void Function(int?) onChanged,
+    List<DropdownMenuItem<int>>? items,
+    required List<TargetPlatform> valuesList,
+  }) {
+    _checkInitialized();
+    const double kItemExtent = 32.0;
+    void saveFinal() => onChanged.call(value);
+    return _buildSpecific(
+      material: () => DropdownButton<int>(
+        value: value,
+        onChanged: onChanged,
+        items: items,
+        focusColor: Colors.transparent,
+        underline: const SizedBox(),
+      ),
+      cupertino: () => CupertinoButton(
+        padding: EdgeInsets.zero,
+        // Display a CupertinoPicker with list of fruits.
+        onPressed: () => _showDialog(
+            context,
+            CupertinoPicker(
+              magnification: 1.22,
+              squeeze: 1.2,
+              useMagnifier: true,
+              itemExtent: kItemExtent,
+              scrollController: FixedExtentScrollController(initialItem: value),
+              // This is called when selected item is changed.
+              onSelectedItemChanged: (selectedValue) => value = selectedValue, //onChanged,
+              children: List<Widget>.generate(valuesList.length, (int index) {
+                return Center(
+                  child: Text(
+                    valuesList[index].toString(),
+                  ),
+                );
+              }),
+            ),
+            saveFinal),
+        // This displays the selected fruit name.
+        child: Text(
+          valuesList[value!].toString(),
+          style: const TextStyle(
+            fontSize: 22.0,
+          ),
+        ),
+      ),
+    );
+  }
+
+  static Future<void> _showDialog(
+      BuildContext context, Widget child, void Function() saveFinal) async {
+    await showCupertinoModalPopup<void>(
+      semanticsDismissible: true,
+      context: context,
+      builder: (BuildContext context) => Container(
+        height: 216,
+        padding: const EdgeInsets.only(top: 6.0),
+        // The Bottom margin is provided to align the popup above the system navigation bar.
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        // Provide a background color for the popup.
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        // Use a SafeArea widget to avoid system overlaps.
+        child: SafeArea(
+          top: false,
+          child: child,
+        ),
+      ),
+    );
+    saveFinal.call();
+  }
+
   static Widget _buildSpecific({
     required WidgetProvider material,
     required WidgetProvider cupertino,
